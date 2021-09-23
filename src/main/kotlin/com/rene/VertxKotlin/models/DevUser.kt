@@ -1,18 +1,21 @@
 package com.rene.VertxKotlin.models
 
-class DevUser {
+import javax.persistence.Id
+import javax.persistence.GeneratedValue
+import javax.persistence.Table
+import javax.persistence.Entity
 
-	var id: Int = 0
+
+@Entity
+@Table(name = "dev_users")
+class DevUser{
+
+	@Id
+	@GeneratedValue(GenerationType.IDENTITY)
+	val id: Int = 0
 	var name: String = ""
 	var email: String = ""
 
 
-	constructor() {}
-	constructor(name: String, email: String) {
-
-		this.name = name
-		this.email = email
-
-	}
 }
 
