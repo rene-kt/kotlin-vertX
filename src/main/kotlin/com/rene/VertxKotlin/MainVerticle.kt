@@ -1,4 +1,4 @@
-package com.renejr.vertXKotlin.vertXKotlin
+package com.rene.VertxKotlin
 
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Promise

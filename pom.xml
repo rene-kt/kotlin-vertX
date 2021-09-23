@@ -4,8 +4,8 @@
      xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.renejr.vertXKotlin</groupId>
-  <artifactId>vertXKotlin</artifactId>
+  <groupId>com.rene</groupId>
+  <artifactId>VertxKotlin</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 
   <properties>
@@ -20,7 +20,7 @@
     <vertx.version>4.1.4</vertx.version>
     <junit-jupiter.version>5.7.0</junit-jupiter.version>
 
-    <main.verticle>com.renejr.vertXKotlin.vertXKotlin.MainVerticle</main.verticle>
+    <main.verticle>com.rene.VertxKotlin.MainVerticle</main.verticle>
     <launcher.class>io.vertx.core.Launcher</launcher.class>
   </properties>
 
@@ -39,7 +39,7 @@
   <dependencies>
     <dependency>
       <groupId>io.vertx</groupId>
-      <artifactId>vertx-web-client</artifactId>
+      <artifactId>vertx-jdbc-client</artifactId>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -91,7 +91,7 @@
         <artifactId>kotlin-maven-plugin</artifactId>
         <version>${kotlin.version}</version>
         <configuration>
-          <jvmTarget>11</jvmTarget>
+          <jvmTarget>1.8</jvmTarget>
         </configuration>
         <executions>
           <execution>
