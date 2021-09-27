@@ -32,8 +32,7 @@ class MainVerticle : AbstractVerticle() {
 
       var json: JsonObject = req.bodyAsJson
 
-      var devUser: DevUser = DevUser(json["id"], json["name"], json["email"], json["credits"])
-      req.response().putHeader("content-type", "application/json").end(Json.encodePrettily(devUser))
+      req.response().putHeader("content-type", "application/json").end(Json.encodePrettily(json))
     }
 
 

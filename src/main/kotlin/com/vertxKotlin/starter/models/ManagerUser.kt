@@ -1,19 +1,18 @@
 package com.vertxKotlin.starter.models
 
-class ManagerUser {
-  var id: Int = 0
-  var name: String = ""
-  var email: String = ""
-  var credits: Int = 0
+class ManagerUser: User {
+
   var devs: ArrayList<DevUser> = ArrayList<DevUser>();
 
-  constructor() {}
+  constructor(){}
 
-  constructor(id: Int, name: String, credits: Int, devs: Array<DevUser>) {
+  constructor(id: Int, name: String, credits: Int, devs: ArrayList<DevUser>, projects: ArrayList<Project>) {
     this.id = id
     this.name = name
     this.credits = credits
-    this.devs.addAll(devs)
+    this.devs = devs
+    this.projects = projects
   }
+
 
 }
