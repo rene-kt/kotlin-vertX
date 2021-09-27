@@ -32,10 +32,11 @@ class MainVerticle : AbstractVerticle() {
 
       var json: JsonObject = req.bodyAsJson
 
-      var devUserTeste: DevUser = DevUser(1, "teste", "teste", 10)
       var devUser: DevUser = DevUser(json["id"], json["name"], json["email"], json["credits"])
-      req.response().putHeader("content-type", "application/json").end(Json.encodePrettily(devUserTeste))
+      req.response().putHeader("content-type", "application/json").end(Json.encodePrettily(devUser))
     }
+
+
     vertx.createHttpServer().requestHandler(router)
       .listen(8888) { http ->
         if (http.succeeded()) {
