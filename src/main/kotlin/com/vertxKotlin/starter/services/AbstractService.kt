@@ -3,7 +3,7 @@ package com.vertxKotlin.starter.services
 import com.vertxKotlin.starter.models.Project
 import com.vertxKotlin.starter.models.User
 
-class AbstractService {
+open class AbstractService {
 
 
 
