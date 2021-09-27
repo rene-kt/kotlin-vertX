@@ -5,9 +5,10 @@ import com.vertxKotlin.starter.models.User
 
 open class AbstractService {
 
-
-
   fun createProject(user: User, project: Project){
+
+      if(user.id == 0) throw NoSuchElementException()
+
       project.id = returnTheIdOfProject(user)
       user.projects.add(project)
   }

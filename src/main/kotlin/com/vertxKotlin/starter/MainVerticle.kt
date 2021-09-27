@@ -1,5 +1,6 @@
 package com.vertxKotlin.starter
 
+import com.vertxKotlin.starter.handlers.ResponseHandler
 import com.vertxKotlin.starter.models.DevUser
 import com.vertxKotlin.starter.models.Project
 import com.vertxKotlin.starter.services.DevService
@@ -10,7 +11,6 @@ import io.vertx.core.json.JsonObject
 import io.vertx.core.json.jackson.DatabindCodec
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
-import io.vertx.kotlin.core.json.get
 
 var codec = Json.CODEC as DatabindCodec
 
@@ -27,15 +27,18 @@ class MainVerticle : AbstractVerticle() {
 
     router.post("/devuser").handler { req ->
       devLogged = devService.createDevUser(req.bodyAsJson)
-      req.response().putHeader("content-type", "application/json").end(Json.encodePrettily(devLogged))
+      req.response().setStatusCode(201).putHeader("content-type", "application/json").end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(devLogged))))
     }
 
     router.post("/devuser/project").handler { req ->
-
       var project: Project = Project()
 
-      devService.createProject(devLogged, project.jsonToObject(req.bodyAsJson))
-      req.response().putHeader("content-type", "application/json").end(Json.encodePrettily(devLogged))
+      try {
+        devService.createProject(devLogged, project.jsonToObject(req.bodyAsJson))
+        req.response().putHeader("content-type", "application/json").end(Json.encodePrettily(ResponseHandler(201, "Your project was created!", JsonObject.mapFrom(project))))
+      }catch(e: NoSuchElementException){
+        req.response().setStatusCode(403).putHeader("content-type", "application/json").end(Json.encodePrettily(ResponseHandler(403, "You need to create an account first", null)))
+      }
     }
 
 
