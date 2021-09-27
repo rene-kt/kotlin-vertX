@@ -1,4 +1,4 @@
-package com.rene.kotlinvertx
+package com.vertxKotlin.starter
 
 import io.vertx.core.Vertx
 import io.vertx.junit5.VertxExtension
