@@ -1,14 +1,16 @@
 package com.vertxKotlin.starter
 
+import com.vertxKotlin.starter.models.DevUser
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Promise
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
+import io.vertx.core.json.jackson.DatabindCodec
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
-import io.vertx.pgclient.PgConnectOptions
-import io.vertx.pgclient.PgPool
-import io.vertx.sqlclient.PoolOptions
+import io.vertx.kotlin.core.json.get
+
+var codec = Json.CODEC as DatabindCodec
 
 
 class MainVerticle : AbstractVerticle() {
@@ -29,8 +31,10 @@ class MainVerticle : AbstractVerticle() {
     router.post("/user").handler { req ->
 
       var json: JsonObject = req.bodyAsJson
-      println(json)
-      req.response().putHeader("content-type", "application/json").end(Json.encode(json))
+
+      var devUserTeste: DevUser = DevUser(1, "teste", "teste", 10)
+      var devUser: DevUser = DevUser(json["id"], json["name"], json["email"], json["credits"])
+      req.response().putHeader("content-type", "application/json").end(Json.encodePrettily(devUserTeste))
     }
     vertx.createHttpServer().requestHandler(router)
       .listen(8888) { http ->
@@ -42,19 +46,6 @@ class MainVerticle : AbstractVerticle() {
         }
       }
 
-    val connectOptions = PgConnectOptions()
-      .setPort(5400)
-      .setHost("rene")
-      .setDatabase("vertx")
-      .setUser("postgres")
-      .setPassword("admin")
-// Pool options
-    val poolOptions = PoolOptions()
-      .setMaxSize(5)
 
-// Create the pooled client
-    val client = PgPool.client(vertx, connectOptions, poolOptions)
-
-    client.query("create table teste")
   }
 }
