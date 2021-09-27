@@ -1,6 +1,7 @@
 package com.vertxKotlin.starter
 
 import com.vertxKotlin.starter.models.DevUser
+import com.vertxKotlin.starter.models.Project
 import com.vertxKotlin.starter.services.DevService
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Promise
@@ -24,8 +25,16 @@ class MainVerticle : AbstractVerticle() {
 
     var devLogged: DevUser = DevUser()
 
-    router.post("/user").handler { req ->
+    router.post("/devuser").handler { req ->
       devLogged = devService.createDevUser(req.bodyAsJson)
+      req.response().putHeader("content-type", "application/json").end(Json.encodePrettily(devLogged))
+    }
+
+    router.post("/devuser/project").handler { req ->
+
+      var project: Project = Project()
+
+      devService.createProject(devLogged, project.jsonToObject(req.bodyAsJson))
       req.response().putHeader("content-type", "application/json").end(Json.encodePrettily(devLogged))
     }
 
