@@ -22,12 +22,14 @@ class MainVerticle : AbstractVerticle() {
     router.route().handler(BodyHandler.create());
 
     val devService: DevService = DevService()
-
     var devLogged: DevUser = DevUser()
+
+
 
     router.post("/devuser").handler { req ->
       devLogged = devService.createDevUser(req.bodyAsJson)
-      req.response().setStatusCode(201).putHeader("content-type", "application/json").end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(devLogged))))
+      req.response().setStatusCode(201).putHeader("content-type", "application/json")
+        .end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(devLogged))))
     }
 
     router.post("/devuser/project").handler { req ->
@@ -35,10 +37,25 @@ class MainVerticle : AbstractVerticle() {
 
       try {
         devService.createProject(devLogged, project.jsonToObject(req.bodyAsJson))
-        req.response().putHeader("content-type", "application/json").end(Json.encodePrettily(ResponseHandler(201, "Your project was created!", JsonObject.mapFrom(project))))
-      }catch(e: NoSuchElementException){
-        req.response().setStatusCode(403).putHeader("content-type", "application/json").end(Json.encodePrettily(ResponseHandler(403, "You need to create an account first", null)))
+        req.response().putHeader("content-type", "application/json")
+          .end(Json.encodePrettily(ResponseHandler(201, "Your project was created!", JsonObject.mapFrom(devLogged))))
+      } catch (e: NoSuchElementException) {
+        req.response().setStatusCode(403).putHeader("content-type", "application/json")
+          .end(Json.encodePrettily(ResponseHandler(403, "You need to create an account first", null)))
       }
+    }
+
+    router.delete("/devuser/project/:projectId").handler { req ->
+
+      var projectId: Int = req.request().getParam("projectId").toInt()
+      try {
+        devService.deleteProject(devLogged, projectId)
+        req.response().putHeader("content-type", "application/json").setStatusCode(204).end()
+      } catch (e: NoSuchElementException) {
+        req.response().putHeader("content-type", "application/json").setStatusCode(404)
+          .end(Json.encodePrettily(ResponseHandler(404, "The object was not found", null)))
+      }
+
     }
 
 
@@ -51,7 +68,5 @@ class MainVerticle : AbstractVerticle() {
           startPromise.fail(http.cause());
         }
       }
-
-
   }
 }
