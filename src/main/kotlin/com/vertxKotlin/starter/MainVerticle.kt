@@ -5,8 +5,10 @@ import com.vertxKotlin.starter.exceptions.UserNotLoggedException
 import com.vertxKotlin.starter.handlers.ExceptionsResponseHandler
 import com.vertxKotlin.starter.handlers.ResponseHandler
 import com.vertxKotlin.starter.models.DevUser
+import com.vertxKotlin.starter.models.ManagerUser
 import com.vertxKotlin.starter.models.Project
 import com.vertxKotlin.starter.services.DevService
+import com.vertxKotlin.starter.services.ManagerService
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Promise
 import io.vertx.core.json.Json
@@ -26,9 +28,19 @@ class MainVerticle : AbstractVerticle() {
     router.route().handler(BodyHandler.create());
 
     val devService: DevService = DevService()
+    val managerService: ManagerService = ManagerService()
+
     var devLogged: DevUser = DevUser()
+    var managerLogged: ManagerUser = ManagerUser()
 
     val exceptionsResponseHandler: ExceptionsResponseHandler = ExceptionsResponseHandler()
+
+    router.post("/manageruser").handler { req ->
+      managerLogged = managerService.createManagerUser(req.bodyAsJson)
+      req.response().setStatusCode(201).putHeader("content-type", "application/json")
+        .end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(managerLogged))))
+    }
+
 
     router.post("/devuser").handler { req ->
       devLogged = devService.createDevUser(req.bodyAsJson)
@@ -55,12 +67,12 @@ class MainVerticle : AbstractVerticle() {
       try {
         devService.deleteProject(devLogged, projectId)
         req.response().putHeader("content-type", "application/json").setStatusCode(204).end()
+      } catch (e: UserNotLoggedException) {
+        exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
       } catch (e: ObjectNotFoundException) {
         exceptionsResponseHandler.objectNotFoundExceptionResponse(req, e)
       }
-      catch (e: UserNotLoggedException) {
-        exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
-      }
+
 
     }
 

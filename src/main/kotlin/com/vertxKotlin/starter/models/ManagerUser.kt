@@ -6,12 +6,10 @@ class ManagerUser: User {
 
   constructor(){}
 
-  constructor(id: Int, name: String, credits: Int, devs: ArrayList<DevUser>, projects: ArrayList<Project>) {
+  constructor(id: Int, name: String, credits: Int) {
     this.id = id
     this.name = name
     this.credits = credits
-    this.devs = devs
-    this.projects = projects
   }
 
 
