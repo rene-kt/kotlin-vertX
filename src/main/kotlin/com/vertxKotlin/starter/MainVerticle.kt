@@ -35,6 +35,13 @@ class MainVerticle : AbstractVerticle() {
 
     val exceptionsResponseHandler: ExceptionsResponseHandler = ExceptionsResponseHandler()
 
+    router.get("/manageruser").handler { req ->
+      if(managerLogged.id == 0) exceptionsResponseHandler.userNotLoggedExceptionResponse(req, UserNotLoggedException())
+
+      req.response().setStatusCode(200).putHeader("content-type", "application/json")
+        .end(Json.encodePrettily(ResponseHandler(200, "Successful search", JsonObject.mapFrom(managerLogged))))
+    }
+
     router.post("/manageruser").handler { req ->
       managerLogged = managerService.createManagerUser(req.bodyAsJson)
       req.response().setStatusCode(201).putHeader("content-type", "application/json")
@@ -42,12 +49,23 @@ class MainVerticle : AbstractVerticle() {
     }
 
     router.post("/manageruser/devuser").handler { req ->
-      managerService.createDevUser(managerLogged, req.bodyAsJson)
-      req.response().setStatusCode(201).putHeader("content-type", "application/json")
-        .end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(managerLogged))))
+
+      try {
+        managerService.createDevUser(managerLogged, req.bodyAsJson)
+        req.response().setStatusCode(201).putHeader("content-type", "application/json")
+          .end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(managerLogged))))
+      } catch (e: UserNotLoggedException) {
+        exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
+      }
+
     }
 
+    router.get("/devuser").handler { req ->
+      if(devLogged.id == 0) exceptionsResponseHandler.userNotLoggedExceptionResponse(req, UserNotLoggedException())
 
+      req.response().setStatusCode(200).putHeader("content-type", "application/json")
+        .end(Json.encodePrettily(ResponseHandler(200, "Successful search", JsonObject.mapFrom(devLogged))))
+    }
 
     router.post("/devuser").handler { req ->
       devLogged = devService.createDevUser(req.bodyAsJson)
