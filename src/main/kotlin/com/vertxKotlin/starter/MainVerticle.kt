@@ -1,6 +1,8 @@
 package com.vertxKotlin.starter
 
+import com.vertxKotlin.starter.exceptions.ObjectNotFoundException
 import com.vertxKotlin.starter.exceptions.UserNotLoggedException
+import com.vertxKotlin.starter.handlers.ExceptionsResponseHandler
 import com.vertxKotlin.starter.handlers.ResponseHandler
 import com.vertxKotlin.starter.models.DevUser
 import com.vertxKotlin.starter.models.Project
@@ -26,12 +28,7 @@ class MainVerticle : AbstractVerticle() {
     val devService: DevService = DevService()
     var devLogged: DevUser = DevUser()
 
-    fun userNotLoggedExceptionResponse(req: RoutingContext, e: UserNotLoggedException){
-      req.response().setStatusCode(403).putHeader("content-type", "application/json")
-        .end(Json.encodePrettily(ResponseHandler(403, e.message, null)))
-    }
-
-
+    val exceptionsResponseHandler: ExceptionsResponseHandler = ExceptionsResponseHandler()
 
     router.post("/devuser").handler { req ->
       devLogged = devService.createDevUser(req.bodyAsJson)
@@ -47,22 +44,22 @@ class MainVerticle : AbstractVerticle() {
         req.response().putHeader("content-type", "application/json")
           .end(Json.encodePrettily(ResponseHandler(201, "Your project was created!", JsonObject.mapFrom(devLogged))))
       } catch (e: UserNotLoggedException) {
-        userNotLoggedExceptionResponse(req, e)
+        exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
       }
     }
 
     router.delete("/devuser/project/:projectId").handler { req ->
 
       var projectId: Int = req.request().getParam("projectId").toInt()
+
       try {
         devService.deleteProject(devLogged, projectId)
         req.response().putHeader("content-type", "application/json").setStatusCode(204).end()
-      } catch (e: NoSuchElementException) {
-        req.response().putHeader("content-type", "application/json").setStatusCode(404)
-          .end(Json.encodePrettily(ResponseHandler(404, "The object was not found", null)))
+      } catch (e: ObjectNotFoundException) {
+        exceptionsResponseHandler.objectNotFoundExceptionResponse(req, e)
       }
       catch (e: UserNotLoggedException) {
-        userNotLoggedExceptionResponse(req, e)
+        exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
       }
 
     }

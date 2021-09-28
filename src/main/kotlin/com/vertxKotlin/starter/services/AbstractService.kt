@@ -1,5 +1,6 @@
 package com.vertxKotlin.starter.services
 
+import com.vertxKotlin.starter.exceptions.ObjectNotFoundException
 import com.vertxKotlin.starter.exceptions.UserNotLoggedException
 import com.vertxKotlin.starter.models.Project
 import com.vertxKotlin.starter.models.User
@@ -20,7 +21,7 @@ open class AbstractService {
       var project: Project = user.projects.single { it.id == projectId }
       user.projects.remove(project)
     } catch (e: NoSuchElementException) {
-      throw NoSuchElementException()
+      throw ObjectNotFoundException("This object was not found")
     }
 
   }
