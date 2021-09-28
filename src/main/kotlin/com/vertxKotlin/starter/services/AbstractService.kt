@@ -9,7 +9,7 @@ open class AbstractService {
 
   fun createProject(user: User, project: Project){
 
-      if(user.id == 0) throw UserNotLoggedException("You need to create an account first")
+      if(user.id == 0) throw UserNotLoggedException()
 
       project.id = returnTheIdOfProject(user)
       user.projects.add(project)
@@ -21,7 +21,7 @@ open class AbstractService {
       var project: Project = user.projects.single { it.id == projectId }
       user.projects.remove(project)
     } catch (e: NoSuchElementException) {
-      throw ObjectNotFoundException("This object was not found")
+      throw ObjectNotFoundException()
     }
 
   }

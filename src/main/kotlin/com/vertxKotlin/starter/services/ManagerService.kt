@@ -1,5 +1,6 @@
 package com.vertxKotlin.starter.services
 
+import com.vertxKotlin.starter.exceptions.ObjectNotFoundException
 import com.vertxKotlin.starter.models.DevUser
 import com.vertxKotlin.starter.models.ManagerUser
 import com.vertxKotlin.starter.models.Project
@@ -34,6 +35,14 @@ class ManagerService: AbstractService() {
 
   }
 
+  fun findDevById(manager: ManagerUser, id: Int): DevUser {
+    var dev: DevUser = DevUser()
+    try {
+      return manager.devs.single { it.id == id }
+    } catch (e: NoSuchElementException) {
+      throw ObjectNotFoundException("This object was not found")
+    }
+  }
 
 
   fun returnTheIdOfDevs(user: ManagerUser): Int {
