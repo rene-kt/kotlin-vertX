@@ -1,5 +1,8 @@
 package com.vertxKotlin.starter.models
 
+import io.vertx.core.json.JsonObject
+import io.vertx.kotlin.core.json.get
+
 class DevUser: User {
 
     var manager: ManagerUser = ManagerUser()
@@ -11,4 +14,5 @@ class DevUser: User {
     this.credits = credits
     this.manager = manager
   }
+
 }

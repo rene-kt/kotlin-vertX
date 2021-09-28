@@ -38,8 +38,15 @@ class MainVerticle : AbstractVerticle() {
     router.post("/manageruser").handler { req ->
       managerLogged = managerService.createManagerUser(req.bodyAsJson)
       req.response().setStatusCode(201).putHeader("content-type", "application/json")
+        .end(Json.encodePrettily(ResponseHandler(201, "A new dev was created", JsonObject.mapFrom(managerLogged))))
+    }
+
+    router.post("/manageruser/devuser").handler { req ->
+      managerService.createDevUser(managerLogged, req.bodyAsJson)
+      req.response().setStatusCode(201).putHeader("content-type", "application/json")
         .end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(managerLogged))))
     }
+
 
 
     router.post("/devuser").handler { req ->
@@ -72,8 +79,6 @@ class MainVerticle : AbstractVerticle() {
       } catch (e: ObjectNotFoundException) {
         exceptionsResponseHandler.objectNotFoundExceptionResponse(req, e)
       }
-
-
     }
 
     vertx.createHttpServer().requestHandler(router)

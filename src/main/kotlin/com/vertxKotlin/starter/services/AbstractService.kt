@@ -26,7 +26,7 @@ open class AbstractService {
 
   }
 
-  private fun returnTheIdOfProject(user: User): Int {
+  fun returnTheIdOfProject(user: User): Int {
     var id: Int = 1;
 
     for (i in 1..user.projects.size) {
