@@ -1,5 +1,6 @@
 package com.vertxKotlin.starter.services
 
+import com.vertxKotlin.starter.exceptions.UserNotLoggedException
 import com.vertxKotlin.starter.models.Project
 import com.vertxKotlin.starter.models.User
 
@@ -7,7 +8,7 @@ open class AbstractService {
 
   fun createProject(user: User, project: Project){
 
-      if(user.id == 0) throw NoSuchElementException()
+      if(user.id == 0) throw UserNotLoggedException("You need to create an account first")
 
       project.id = returnTheIdOfProject(user)
       user.projects.add(project)

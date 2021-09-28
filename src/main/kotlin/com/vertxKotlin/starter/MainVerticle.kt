@@ -1,5 +1,6 @@
 package com.vertxKotlin.starter
 
+import com.vertxKotlin.starter.exceptions.UserNotLoggedException
 import com.vertxKotlin.starter.handlers.ResponseHandler
 import com.vertxKotlin.starter.models.DevUser
 import com.vertxKotlin.starter.models.Project
@@ -10,6 +11,7 @@ import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import io.vertx.core.json.jackson.DatabindCodec
 import io.vertx.ext.web.Router
+import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.BodyHandler
 
 var codec = Json.CODEC as DatabindCodec
@@ -23,6 +25,11 @@ class MainVerticle : AbstractVerticle() {
 
     val devService: DevService = DevService()
     var devLogged: DevUser = DevUser()
+
+    fun userNotLoggedExceptionResponse(req: RoutingContext, e: UserNotLoggedException){
+      req.response().setStatusCode(403).putHeader("content-type", "application/json")
+        .end(Json.encodePrettily(ResponseHandler(403, e.message, null)))
+    }
 
 
 
@@ -39,9 +46,8 @@ class MainVerticle : AbstractVerticle() {
         devService.createProject(devLogged, project.jsonToObject(req.bodyAsJson))
         req.response().putHeader("content-type", "application/json")
           .end(Json.encodePrettily(ResponseHandler(201, "Your project was created!", JsonObject.mapFrom(devLogged))))
-      } catch (e: NoSuchElementException) {
-        req.response().setStatusCode(403).putHeader("content-type", "application/json")
-          .end(Json.encodePrettily(ResponseHandler(403, "You need to create an account first", null)))
+      } catch (e: UserNotLoggedException) {
+        userNotLoggedExceptionResponse(req, e)
       }
     }
 
@@ -55,9 +61,11 @@ class MainVerticle : AbstractVerticle() {
         req.response().putHeader("content-type", "application/json").setStatusCode(404)
           .end(Json.encodePrettily(ResponseHandler(404, "The object was not found", null)))
       }
+      catch (e: UserNotLoggedException) {
+        userNotLoggedExceptionResponse(req, e)
+      }
 
     }
-
 
     vertx.createHttpServer().requestHandler(router)
       .listen(8888) { http ->
