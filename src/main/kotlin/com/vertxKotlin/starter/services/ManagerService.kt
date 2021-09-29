@@ -1,6 +1,7 @@
 package com.vertxKotlin.starter.services
 
 import com.vertxKotlin.starter.exceptions.ObjectNotFoundException
+import com.vertxKotlin.starter.exceptions.UserNotLoggedException
 import com.vertxKotlin.starter.models.DevUser
 import com.vertxKotlin.starter.models.ManagerUser
 import com.vertxKotlin.starter.models.Project
@@ -16,7 +17,7 @@ class ManagerService: AbstractService() {
 
   fun createDevUser(manager: ManagerUser, user: JsonObject){
 
-      var projectsJson: JsonArray = user["projects"]
+      val projectsJson: JsonArray = user["projects"]
       var devUser: DevUser = DevUser()
 
       devUser.name = user["name"]
@@ -35,8 +36,21 @@ class ManagerService: AbstractService() {
 
   }
 
-  fun findDevById(manager: ManagerUser, id: Int): DevUser {
-    var dev: DevUser = DevUser()
+  fun changeCredits(manager: ManagerUser, devId: Int, credits: Int){
+
+    if (manager.id == 0 ) throw UserNotLoggedException("You need to create your account first")
+    if(devId == null || devId == 0){
+      manager.credits += credits
+    } else{
+    val dev: DevUser = findDevById(manager, devId)
+    dev.credits += credits
+
+    }
+
+  }
+
+  private fun findDevById(manager: ManagerUser, id: Int): DevUser {
+    var dev = DevUser()
     try {
       return manager.devs.single { it.id == id }
     } catch (e: NoSuchElementException) {
@@ -45,7 +59,7 @@ class ManagerService: AbstractService() {
   }
 
 
-  fun returnTheIdOfDevs(user: ManagerUser): Int {
+  private fun returnTheIdOfDevs(user: ManagerUser): Int {
     var id: Int = 1;
 
     for (i in 1..user.devs.size) {

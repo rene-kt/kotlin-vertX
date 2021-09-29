@@ -13,30 +13,28 @@ import io.vertx.core.AbstractVerticle
 import io.vertx.core.Promise
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
-import io.vertx.core.json.jackson.DatabindCodec
 import io.vertx.ext.web.Router
-import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.BodyHandler
+import io.vertx.kotlin.core.json.get
 
-var codec = Json.CODEC as DatabindCodec
 
 
 class MainVerticle : AbstractVerticle() {
 
   override fun start(startPromise: Promise<Void>) {
     val router: Router = Router.router(vertx)
-    router.route().handler(BodyHandler.create());
+    router.route().handler(BodyHandler.create())
 
-    val devService: DevService = DevService()
-    val managerService: ManagerService = ManagerService()
+    val devService = DevService()
+    val managerService = ManagerService()
 
-    var devLogged: DevUser = DevUser()
-    var managerLogged: ManagerUser = ManagerUser()
+    var devLogged = DevUser()
+    var managerLogged = ManagerUser()
 
-    val exceptionsResponseHandler: ExceptionsResponseHandler = ExceptionsResponseHandler()
+    val exceptionsResponseHandler = ExceptionsResponseHandler()
 
     router.get("/manageruser").handler { req ->
-      if(managerLogged.id == 0) exceptionsResponseHandler.userNotLoggedExceptionResponse(req, UserNotLoggedException())
+      if (managerLogged.id == 0) exceptionsResponseHandler.userNotLoggedExceptionResponse(req, UserNotLoggedException())
 
       req.response().setStatusCode(200).putHeader("content-type", "application/json")
         .end(Json.encodePrettily(ResponseHandler(200, "Successful search", JsonObject.mapFrom(managerLogged))))
@@ -60,8 +58,23 @@ class MainVerticle : AbstractVerticle() {
 
     }
 
+    router.post("/manageruser/credits").handler { req ->
+
+      try {
+
+        managerService.changeCredits(managerLogged, req.bodyAsJson["devId"], req.bodyAsJson["credits"])
+        req.response().setStatusCode(201).putHeader("content-type", "application/json")
+          .end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(managerLogged))))
+      } catch (e: UserNotLoggedException) {
+        exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
+      } catch (e: ObjectNotFoundException) {
+        exceptionsResponseHandler.objectNotFoundExceptionResponse(req, e)
+      }
+
+    }
+
     router.get("/devuser").handler { req ->
-      if(devLogged.id == 0) exceptionsResponseHandler.userNotLoggedExceptionResponse(req, UserNotLoggedException())
+      if (devLogged.id == 0) exceptionsResponseHandler.userNotLoggedExceptionResponse(req, UserNotLoggedException())
 
       req.response().setStatusCode(200).putHeader("content-type", "application/json")
         .end(Json.encodePrettily(ResponseHandler(200, "Successful search", JsonObject.mapFrom(devLogged))))
@@ -74,7 +87,7 @@ class MainVerticle : AbstractVerticle() {
     }
 
     router.post("/devuser/project").handler { req ->
-      var project: Project = Project()
+      var project = Project()
 
       try {
         devService.createProject(devLogged, project.jsonToObject(req.bodyAsJson))
@@ -87,7 +100,7 @@ class MainVerticle : AbstractVerticle() {
 
     router.delete("/devuser/project/:projectId").handler { req ->
 
-      var projectId: Int = req.request().getParam("projectId").toInt()
+      val projectId: Int = req.request().getParam("projectId").toInt()
 
       try {
         devService.deleteProject(devLogged, projectId)
@@ -105,7 +118,7 @@ class MainVerticle : AbstractVerticle() {
           startPromise.complete()
           println("HTTP server started on port 8888")
         } else {
-          startPromise.fail(http.cause());
+          startPromise.fail(http.cause())
         }
       }
   }
