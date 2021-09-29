@@ -98,6 +98,20 @@ class MainVerticle : AbstractVerticle() {
       }
     }
 
+    router.delete("/manageruser/project/:projectId").handler { req ->
+
+      val projectId: Int = req.request().getParam("projectId").toInt()
+
+      try {
+        managerService.deleteProject(managerLogged, projectId)
+        req.response().putHeader("content-type", "application/json").setStatusCode(204).end()
+      } catch (e: UserNotLoggedException) {
+        exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
+      } catch (e: ObjectNotFoundException) {
+        exceptionsResponseHandler.objectNotFoundExceptionResponse(req, e)
+      }
+    }
+
 
     router.get("/devuser").handler { req ->
       if (devLogged.id == 0) exceptionsResponseHandler.userNotLoggedExceptionResponse(req, UserNotLoggedException())
