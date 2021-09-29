@@ -8,6 +8,6 @@ import io.vertx.kotlin.core.json.get
 class DevService: AbstractService() {
 
   fun createDevUser(user: JsonObject): DevUser {
-    return DevUser(1, user["name"], 0, ManagerUser())
+    return DevUser(1, user["name"], 0)
   }
 }
