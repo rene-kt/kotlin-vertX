@@ -36,6 +36,10 @@ class ManagerService : AbstractService() {
 
   }
 
+  fun deleteDev(manager: ManagerUser, devId: Int) {
+    manager.devs.remove(findDevById(manager, devId))
+  }
+
   fun changeCredits(manager: ManagerUser, devId: Int, credits: Int) {
 
     if (manager.id == 0) throw UserNotLoggedException("You need to create your account first")

@@ -7,6 +7,7 @@ import com.vertxKotlin.starter.handlers.ResponseHandler
 import com.vertxKotlin.starter.models.DevUser
 import com.vertxKotlin.starter.models.ManagerUser
 import com.vertxKotlin.starter.models.Project
+import com.vertxKotlin.starter.verticles.ManagerVerticle
 import com.vertxKotlin.starter.services.DevService
 import com.vertxKotlin.starter.services.ManagerService
 import io.vertx.core.AbstractVerticle
@@ -32,85 +33,21 @@ class MainVerticle : AbstractVerticle() {
 
     val exceptionsResponseHandler = ExceptionsResponseHandler()
 
-    router.get("/manageruser").handler { req ->
-      if (managerLogged.id == 0) exceptionsResponseHandler.userNotLoggedExceptionResponse(req, UserNotLoggedException())
+    val managerVerticle = ManagerVerticle()
 
-      req.response().setStatusCode(200).putHeader("content-type", "application/json")
-        .end(Json.encodePrettily(ResponseHandler(200, "Successful search", JsonObject.mapFrom(managerLogged))))
-    }
 
-    router.post("/manageruser").handler { req ->
+    router.get("/manageruser").handler { managerVerticle.returnManager(managerLogged, it) }
+    router.post("/manageruser").handler { managerLogged = managerVerticle.createManager(it)}
+    router.post("/manageruser/devuser").handler { managerVerticle.createDevUser(managerLogged, it) }
+    router.delete("/manageruser/devuser/:devId").handler { managerVerticle.deleteDevUser(managerLogged, it) }
+    router.put("/manageruser/credits").handler { managerVerticle.changeCredits(managerLogged, it) }
+    router.post("/manageruser/project").handler { managerVerticle.createProject(managerLogged, it)}
+    router.delete("/manageruser/project/:projectId").handler { managerVerticle.deleteProject(managerLogged, it)}
 
-      try {
-        managerLogged = managerService.createManagerUser(req.bodyAsJson)
-        req.response().setStatusCode(201).putHeader("content-type", "application/json")
-          .end(Json.encodePrettily(ResponseHandler(201, "A new dev was created", JsonObject.mapFrom(managerLogged))))
-      } catch (e: NullPointerException) {
-        exceptionsResponseHandler.nullRequestBodyResponse(req, e)
-      }
 
-    }
 
-    router.post("/manageruser/devuser").handler { req ->
 
-      try {
-        managerService.createDevUser(managerLogged, req.bodyAsJson)
-        req.response().setStatusCode(201).putHeader("content-type", "application/json")
-          .end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(managerLogged))))
-      } catch (e: NullPointerException) {
-        exceptionsResponseHandler.nullRequestBodyResponse(req, e)
-      } catch (e: UserNotLoggedException) {
-        exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
-      }
 
-    }
-
-    router.post("/manageruser/credits").handler { req ->
-
-      try {
-
-        managerService.changeCredits(managerLogged, req.bodyAsJson["devId"], req.bodyAsJson["credits"])
-        req.response().setStatusCode(201).putHeader("content-type", "application/json")
-          .end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(managerLogged))))
-      } catch (e: NullPointerException) {
-        exceptionsResponseHandler.nullRequestBodyResponse(req, e)
-      } catch (e: UserNotLoggedException) {
-        exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
-      } catch (e: ObjectNotFoundException) {
-        exceptionsResponseHandler.objectNotFoundExceptionResponse(req, e)
-      }
-
-    }
-
-    router.post("/manageruser/project").handler { req ->
-      var project = Project()
-
-      try {
-        managerService.createProject(managerLogged, project.jsonToObject(req.bodyAsJson))
-        req.response().putHeader("content-type", "application/json")
-          .end(Json.encodePrettily(ResponseHandler(201, "Your project was created!", JsonObject.mapFrom(managerLogged))))
-      }
-      catch(e: NullPointerException){
-        exceptionsResponseHandler.nullRequestBodyResponse(req, e)
-      }
-      catch (e: UserNotLoggedException) {
-        exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
-      }
-    }
-
-    router.delete("/manageruser/project/:projectId").handler { req ->
-
-      val projectId: Int = req.request().getParam("projectId").toInt()
-
-      try {
-        managerService.deleteProject(managerLogged, projectId)
-        req.response().putHeader("content-type", "application/json").setStatusCode(204).end()
-      } catch (e: UserNotLoggedException) {
-        exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
-      } catch (e: ObjectNotFoundException) {
-        exceptionsResponseHandler.objectNotFoundExceptionResponse(req, e)
-      }
-    }
 
 
     router.get("/devuser").handler { req ->
@@ -137,11 +74,9 @@ class MainVerticle : AbstractVerticle() {
         devService.createProject(devLogged, project.jsonToObject(req.bodyAsJson))
         req.response().putHeader("content-type", "application/json")
           .end(Json.encodePrettily(ResponseHandler(201, "Your project was created!", JsonObject.mapFrom(devLogged))))
-      }
-      catch(e: NullPointerException){
+      } catch (e: NullPointerException) {
         exceptionsResponseHandler.nullRequestBodyResponse(req, e)
-      }
-      catch (e: UserNotLoggedException) {
+      } catch (e: UserNotLoggedException) {
         exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
       }
     }
@@ -169,5 +104,9 @@ class MainVerticle : AbstractVerticle() {
           startPromise.fail(http.cause())
         }
       }
+
+
   }
+
+
 }
