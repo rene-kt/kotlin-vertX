@@ -18,7 +18,6 @@ import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.kotlin.core.json.get
 
 
-
 class MainVerticle : AbstractVerticle() {
 
   override fun start(startPromise: Promise<Void>) {
@@ -41,9 +40,15 @@ class MainVerticle : AbstractVerticle() {
     }
 
     router.post("/manageruser").handler { req ->
-      managerLogged = managerService.createManagerUser(req.bodyAsJson)
-      req.response().setStatusCode(201).putHeader("content-type", "application/json")
-        .end(Json.encodePrettily(ResponseHandler(201, "A new dev was created", JsonObject.mapFrom(managerLogged))))
+
+      try {
+        managerLogged = managerService.createManagerUser(req.bodyAsJson)
+        req.response().setStatusCode(201).putHeader("content-type", "application/json")
+          .end(Json.encodePrettily(ResponseHandler(201, "A new dev was created", JsonObject.mapFrom(managerLogged))))
+      } catch (e: NullPointerException) {
+        exceptionsResponseHandler.nullRequestBodyResponse(req, e)
+      }
+
     }
 
     router.post("/manageruser/devuser").handler { req ->
@@ -52,6 +57,8 @@ class MainVerticle : AbstractVerticle() {
         managerService.createDevUser(managerLogged, req.bodyAsJson)
         req.response().setStatusCode(201).putHeader("content-type", "application/json")
           .end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(managerLogged))))
+      } catch (e: NullPointerException) {
+        exceptionsResponseHandler.nullRequestBodyResponse(req, e)
       } catch (e: UserNotLoggedException) {
         exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
       }
@@ -65,6 +72,8 @@ class MainVerticle : AbstractVerticle() {
         managerService.changeCredits(managerLogged, req.bodyAsJson["devId"], req.bodyAsJson["credits"])
         req.response().setStatusCode(201).putHeader("content-type", "application/json")
           .end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(managerLogged))))
+      } catch (e: NullPointerException) {
+        exceptionsResponseHandler.nullRequestBodyResponse(req, e)
       } catch (e: UserNotLoggedException) {
         exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
       } catch (e: ObjectNotFoundException) {
@@ -81,9 +90,13 @@ class MainVerticle : AbstractVerticle() {
     }
 
     router.post("/devuser").handler { req ->
-      devLogged = devService.createDevUser(req.bodyAsJson)
-      req.response().setStatusCode(201).putHeader("content-type", "application/json")
-        .end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(devLogged))))
+      try {
+        devLogged = devService.createDevUser(req.bodyAsJson)
+        req.response().setStatusCode(201).putHeader("content-type", "application/json")
+          .end(Json.encodePrettily(ResponseHandler(201, "Your account was created", JsonObject.mapFrom(devLogged))))
+      } catch (e: NullPointerException) {
+        exceptionsResponseHandler.nullRequestBodyResponse(req, e)
+      }
     }
 
     router.post("/devuser/project").handler { req ->
@@ -93,7 +106,11 @@ class MainVerticle : AbstractVerticle() {
         devService.createProject(devLogged, project.jsonToObject(req.bodyAsJson))
         req.response().putHeader("content-type", "application/json")
           .end(Json.encodePrettily(ResponseHandler(201, "Your project was created!", JsonObject.mapFrom(devLogged))))
-      } catch (e: UserNotLoggedException) {
+      }
+      catch(e: NullPointerException){
+        exceptionsResponseHandler.nullRequestBodyResponse(req, e)
+      }
+      catch (e: UserNotLoggedException) {
         exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
       }
     }

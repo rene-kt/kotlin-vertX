@@ -9,41 +9,40 @@ import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.kotlin.core.json.get
 
-class ManagerService: AbstractService() {
+class ManagerService : AbstractService() {
 
   fun createManagerUser(user: JsonObject): ManagerUser {
     return ManagerUser(1, user["name"], 0)
   }
 
-  fun createDevUser(manager: ManagerUser, user: JsonObject){
+  fun createDevUser(manager: ManagerUser, user: JsonObject) {
 
-      val projectsJson: JsonArray = user["projects"]
-      var devUser: DevUser = DevUser()
+    val projectsJson: JsonArray = user["projects"]
+    var devUser: DevUser = DevUser()
 
-      devUser.name = user["name"]
-      devUser.id = returnTheIdOfDevs(manager)
+    devUser.name = user["name"]
+    devUser.id = returnTheIdOfDevs(manager)
 
-      for(i in 0..projectsJson.size() - 1){
-        var project: Project = Project()
-        project.id = returnTheIdOfProject(devUser)
-        project.name = projectsJson.getJsonObject(i)["name"]
-        project.language = projectsJson.getJsonObject(i)["language"]
+    for (i in 0..projectsJson.size() - 1) {
+      var project: Project = Project()
+      project.id = returnTheIdOfProject(devUser)
+      project.name = projectsJson.getJsonObject(i)["name"]
+      project.language = projectsJson.getJsonObject(i)["language"]
 
-        devUser.projects.add(project)
-      }
+      devUser.projects.add(project)
+    }
 
     manager.devs.add(devUser)
 
   }
 
-  fun changeCredits(manager: ManagerUser, devId: Int, credits: Int){
+  fun changeCredits(manager: ManagerUser, devId: Int, credits: Int) {
 
-    if (manager.id == 0 ) throw UserNotLoggedException("You need to create your account first")
-    if(devId == null || devId == 0){
+    if (manager.id == 0) throw UserNotLoggedException("You need to create your account first")
+    if (devId == 0) {
       manager.credits += credits
-    } else{
-    val dev: DevUser = findDevById(manager, devId)
-    dev.credits += credits
+    } else {
+      findDevById(manager, devId).credits += credits
 
     }
 

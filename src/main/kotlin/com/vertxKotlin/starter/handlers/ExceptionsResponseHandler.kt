@@ -17,4 +17,9 @@ class ExceptionsResponseHandler {
       .end(Json.encodePrettily(ResponseHandler(404, e.message, null)))
   }
 
+  fun nullRequestBodyResponse(req: RoutingContext, e: NullPointerException){
+    req.response().putHeader("content-type", "application/json").setStatusCode(400)
+      .end(Json.encodePrettily(ResponseHandler(400, "The JSON body is missing some required attributes", null)))
+  }
+
 }
