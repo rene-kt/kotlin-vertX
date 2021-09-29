@@ -82,6 +82,23 @@ class MainVerticle : AbstractVerticle() {
 
     }
 
+    router.post("/manageruser/project").handler { req ->
+      var project = Project()
+
+      try {
+        managerService.createProject(managerLogged, project.jsonToObject(req.bodyAsJson))
+        req.response().putHeader("content-type", "application/json")
+          .end(Json.encodePrettily(ResponseHandler(201, "Your project was created!", JsonObject.mapFrom(managerLogged))))
+      }
+      catch(e: NullPointerException){
+        exceptionsResponseHandler.nullRequestBodyResponse(req, e)
+      }
+      catch (e: UserNotLoggedException) {
+        exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
+      }
+    }
+
+
     router.get("/devuser").handler { req ->
       if (devLogged.id == 0) exceptionsResponseHandler.userNotLoggedExceptionResponse(req, UserNotLoggedException())
 
