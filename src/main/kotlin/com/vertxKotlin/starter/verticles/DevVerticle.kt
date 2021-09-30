@@ -59,7 +59,7 @@ class DevVerticle: AbstractVerticle() {
 
     try {
       devService.deleteProject(devLogged, projectId)
-      req.response().putHeader("content-type", "application/json").setStatusCode(204).end()
+      req.response().putHeader("content-type", "application/json").setStatusCode(200).end(Json.encodePrettily(ResponseHandler(204, "The project was deleted", JsonObject.mapFrom(devLogged))))
     } catch (e: UserNotLoggedException) {
       exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
     } catch (e: ObjectNotFoundException) {

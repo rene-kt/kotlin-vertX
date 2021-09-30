@@ -60,7 +60,7 @@ class ManagerVerticle : AbstractVerticle() {
 
     try {
       managerService.deleteDev(managerLogged, devId)
-      req.response().putHeader("content-type", "application/json").setStatusCode(204).end()
+      req.response().putHeader("content-type", "application/json").setStatusCode(200).end(Json.encodePrettily(ResponseHandler(204, "The dev was deleted", JsonObject.mapFrom(managerLogged))))
     } catch (e: UserNotLoggedException) {
       exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
     } catch (e: ObjectNotFoundException) {
@@ -85,7 +85,7 @@ class ManagerVerticle : AbstractVerticle() {
   }
 
   fun createProject(managerLogged: ManagerUser, req: RoutingContext) {
-    var project = Project()
+    val project = Project()
 
     try {
       managerService.createProject(managerLogged, project.jsonToObject(req.bodyAsJson))
@@ -112,7 +112,7 @@ class ManagerVerticle : AbstractVerticle() {
 
     try {
       managerService.deleteProject(managerLogged, projectId)
-      req.response().putHeader("content-type", "application/json").setStatusCode(204).end()
+      req.response().putHeader("content-type", "application/json").setStatusCode(200).end(Json.encodePrettily(ResponseHandler(204, "The project was deleted", JsonObject.mapFrom(managerLogged))))
     } catch (e: UserNotLoggedException) {
       exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
     } catch (e: ObjectNotFoundException) {
