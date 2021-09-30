@@ -11,7 +11,7 @@ This application was generated using http://start.vertx.io
 - Run this command to create a container from the [Docker Image](https://hub.docker.com/repository/docker/renejr3/kotlinvertx) located on Docker Hub:
 > Open your terminal, if you're using Windows, make sure to run with the [Windows Power Shell](https://docs.microsoft.com/pt-br/skypeforbusiness/set-up-your-computer-for-windows-powershell/download-and-install-windows-powershell-5-1).
 
-```bash
+```console
 docker run -d -p 8080:8888 renejr3/kotlinvertx
 ```
 
