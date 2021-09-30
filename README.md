@@ -4,7 +4,6 @@
 
 This application was generated using http://start.vertx.io
 
-
 ## Install 
 
 - Make sure you have the [Docker](https://docs.docker.com/get-docker/) installed on your machine. 
@@ -25,3 +24,40 @@ docker run -d -p 8080:8888 renejr3/kotlinvertx
 }
 
 ```
+
+## Build
+
+Build this image in your own Docker Hub repository.
+
+- First of all, create a account in the [Docker Hub](https://hub.docker.com/)
+- After that, create a repository: 
+![image](https://user-images.githubusercontent.com/49681380/135510556-35a82b3b-56a5-4f88-b309-210c8e1a39be.png)
+- Clone or download this github repository
+- Go into the root folder, open your terminal and do the following steps:
+  - Login in your console
+  
+  ```console
+  docker login
+  ``` 
+  
+  - Create a image from the Dockerfile
+  
+  ```console 
+  docker build -f Dockerfile -t YOUR_USERNAME/YOUR_REPOSITORY_NAME .
+  ```
+  
+  > Make sure to have the same username and the same name of the repository that you have created.
+  
+  - Push the image to the Docker Hub: 
+  
+  ```console
+  docker push YOUR_USERNAME/YOUR_REPOSITORY_NAME
+  ```
+  
+  To check if everything goes right, try to run this command and verify the output as the same way as in the **Install**
+  
+  ```console
+  docker run -d -p 8080:8888 YOUR_USERNAME/YOUR_REPOSITORY_NAME
+  ```
+
+
