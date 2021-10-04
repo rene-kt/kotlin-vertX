@@ -55,6 +55,25 @@ class ManagerVerticle : AbstractVerticle() {
 
   }
 
+  fun addProjectsToDevUser(managerLogged: ManagerUser, req: RoutingContext) {
+
+    try {
+      val devId: Int = req.request().getParam("devId").toInt()
+      managerService.addProjectsToADevUser(managerLogged, req.bodyAsJson, devId)
+      req.response().setStatusCode(201).putHeader("content-type", "application/json")
+        .end(Json.encodePrettily(ResponseHandler(201, "A new project was created", JsonObject.mapFrom(managerLogged))))
+    }
+    catch (e: ObjectNotFoundException) {
+      exceptionsResponseHandler.objectNotFoundExceptionResponse(req, e)
+    }
+    catch (e: NullPointerException) {
+      exceptionsResponseHandler.nullRequestBodyResponse(req, e)
+    } catch (e: UserNotLoggedException) {
+      exceptionsResponseHandler.userNotLoggedExceptionResponse(req, e)
+    }
+
+  }
+
   fun deleteDevUser(managerLogged: ManagerUser, req: RoutingContext) {
     val devId: Int = req.request().getParam("devId").toInt()
 

@@ -33,6 +33,8 @@ class MainVerticle : AbstractVerticle() {
     router.post("/manageruser/project").handler { managerVerticle.createProject(managerLogged, it) }
     // PUT
     router.put("/manageruser/credits").handler { managerVerticle.changeCredits(managerLogged, it) }
+    router.put("/manageruser/project/devuser/:devId").handler { managerVerticle.addProjectsToDevUser(managerLogged, it) }
+
     // DELETE
     router.delete("/manageruser/project/:projectId").handler { managerVerticle.deleteProject(managerLogged, it) }
     router.delete("/manageruser/devuser/:devId").handler { managerVerticle.deleteDevUser(managerLogged, it) }

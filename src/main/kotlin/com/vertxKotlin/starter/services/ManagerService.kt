@@ -40,6 +40,14 @@ class ManagerService : AbstractService() {
     manager.devs.remove(findDevById(manager, devId))
   }
 
+  fun addProjectsToADevUser(manager: ManagerUser, projects: JsonObject, devId: Int){
+    var dev = findDevById(manager, devId)
+    var project = Project(projects["name"], projects["language"])
+    project.id = returnTheIdOfProject(dev)
+    dev.projects.add(project)
+
+  }
+
   fun changeCredits(manager: ManagerUser, devId: Int, credits: Int) {
 
     if (manager.id == 0) throw UserNotLoggedException("You need to create your account first")
@@ -53,7 +61,6 @@ class ManagerService : AbstractService() {
   }
 
   private fun findDevById(manager: ManagerUser, id: Int): DevUser {
-    var dev = DevUser()
     try {
       return manager.devs.single { it.id == id }
     } catch (e: NoSuchElementException) {
