@@ -162,6 +162,37 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Add project to a dev",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"teste\",\n    \"language\": \"teste\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8888/manageruser/project/devuser/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8888",
+									"path": [
+										"manageruser",
+										"project",
+										"devuser",
+										"1"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
